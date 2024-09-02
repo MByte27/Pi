@@ -6,7 +6,7 @@ sudo apt full-upgrade -y
 # #################################################
 
 # install pkgs required ###########################
-sudo apt install fio docker-compose lsof -y
+sudo apt install fio docker-compose lsof python3-pip python3-venv -y
 # #################################################
 
 src="/home/pietro/Pi"
