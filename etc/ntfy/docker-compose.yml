@@ -1,0 +1,16 @@
+version: "2.1"
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    container_name: ntfy
+    command:
+      - serve
+    environment:
+      - TZ=UTC+1    # optional: Change to your desired timezone
+    user: 1000:1000 # optional: Set custom user/group or uid/gid
+    volumes:
+      - /var/cache/ntfy:/var/cache/ntfy
+      - /etc/ntfy:/etc/ntfy
+    ports:
+      - 90:80
+    restart: unless-stopped
