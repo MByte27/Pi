@@ -1,4 +1,3 @@
-# v2
 #!/bin/bash
 
 # preliminary update of all packages installed ####
@@ -10,23 +9,29 @@ sudo apt full-upgrade -y
 sudo apt install fio docker-compose lsof -y
 # #################################################
 
+src="/home/pietro/Pi"
+
 move(){
-  src="/home/pietro/Pi"
   sudo cp -r "$src/$1/$2" "/$1"
+  echo "/$1/$2"
 }
 
-activateapp(){
-  cd "$1"
+docker_app_launch(){
+  local dir_path="$1"
+  if [ -d "$dir_path" ]; then
+    cd "$dir_path" || exit
     # Make sure you're in the right directory before executing this
     if [ -f "docker-compose.yml" ]; then
       sudo docker-compose up -d
     fi
+  else
+    echo "Directory $dir_path does not exist."
+  fi
 }
 
-for dir in "$src/etc/*"; do
+for dir in "$src"/*; do
   # get dir name only
   base_dir=$(basename "$dir")
-  res=$(copy_in_system "etc" "$base_dir")
-  activate "$res"
+  res=$(move "etc" "$base_dir")
+  docker_app_launch "$res"
 done
-
