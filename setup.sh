@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# ----------- preliminary update of all installed packages -----------
+# ----------- Preliminary update of all installed packages -----------
 sudo apt update
 sudo apt full-upgrade -y
 # ----------- ----------- ----------- ----------- ----------- --------
 
-# ----------- install required packages -----------
+# ----------- Install required packages -----------
 sudo apt install fio docker-compose lsof python3-pip python3-venv -y
 # ----------- ----------- ----------- ----------- -
 
@@ -19,24 +19,42 @@ if grep -q "Raspberry Pi Zero" /proc/device-tree/model; then
 fi
 # ----------- ----------- ----------- ----------- ----
 
-# Loop over folders in the source directory
-for folder in "$src"/*; do
-    if [ -d "$folder" ]; then
-        dest="$folder"
+# ----------- Launch container from docker-compose file, if present -----------
+container_launch() {
+  dir="$1"
 
-        # Loop over items inside each folder
-        for item in "$folder"/*; do
-            # Check if the item is "uptime-kuma" and skip it if the device is Pi Zero
-            if [[ "$(basename "$item")" = "uptime-kuma" ]] && [ "$is_Zero" = true ]; then
-                continue
-            fi
-
-            # If the destination folder is "etc", use sudo to copy the items
-            if [ "$(basename "$folder")" = "etc" ]; then
-                sudo cp -r "$item" "$dest"
-            else
-                cp -r "$item" "$dest"
-            fi
-        done
+  for file in "$1/*"; do
+    if [ "$file" = "docker-compose.yml" ]; then
+      sudo docker-compose up -d
     fi
-done
+  done
+# ----------- ----------- ----------- ----------- ----------- ----------- ------
+    
+
+}
+
+# ----------- Function to move folder in their respective place -----------
+move () {
+  for folder in "$src"/*; do
+      if [ -d "$folder" ]; then
+          dest="$folder"
+  
+          # Loop over items inside each folder
+          for item in "$folder"/*; do
+              # Check if the item is "uptime-kuma" and skip it if the device is Pi Zero
+              if [[ "$(basename "$item")" = "uptime-kuma" ]] && [ "$is_Zero" = true ]; then
+                  continue
+              fi
+  
+              # If the destination folder is "etc", use sudo to copy the items
+              if [ "$(basename "$folder")" = "etc" ]; then
+                  sudo cp -r "$item" "$dest"
+                  container_launch "/etc/$dest/$item"
+              else
+                  cp -r "$item" "$dest"
+              fi
+          done
+      fi
+  done
+}
+# ----------- ----------- ----------- ----------- ----------- -----
