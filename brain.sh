@@ -3,11 +3,11 @@
 # ################## PRELIMINARY FUNCTION AND CODE ##################
 
 NTFY_SERVER="http://100.103.12.107:90"
-CHANNEL="ntPi3"
+CHANNEL="ntPi3"  # change into ntPi0 when importing into Raspberry Pi 0
 
 # Send function
 send_ntfy() {
-  curl -H "Title: Update System" -H "Priority: $1" -d "$2" "$NTFY_SERVER/$CHANNEL"
+  curl -H "Title: $CHANNEL: Update System" -H "Priority: $1" -d "$2" "$NTFY_SERVER/$CHANNEL"
 }
 # ################## ################## ##################
 
