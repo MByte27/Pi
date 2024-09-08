@@ -37,6 +37,7 @@ container_launch() {
 
 # ----------- Function to move folder in their respective place -----------
 move () {
+# ----------- Directories' code ----------- ----------- ----------- -------
   for folder in "$src"/*; do
       if [ -d $folder ]; then
           dest="$(basename "$folder")"
@@ -62,6 +63,19 @@ move () {
               fi
           done
       fi
+  done
+# ----------- Files' code ----------- ----------- ----------- -----
+  for filepath in "$src"/*; do
+    file="$(basename "$filepath")"
+    if [ -f "$file" ]; then
+      if [ "$file" = "README.md" ]; then
+        echo "Skipping README.md.. "
+	continue
+      else
+	echo "Copying file $file.. "
+        cp "$file" ".."
+      fi
+    fi
   done
 }
 # ----------- ----------- ----------- ----------- ----------- -----
