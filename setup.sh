@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ----------- Preliminary update of all installed packages -----------
-#sudo apt update
-#sudo apt full-upgrade -y
+sudo apt update
+sudo apt full-upgrade -y
 # ----------- ----------- ----------- ----------- ----------- --------
 
 # ----------- Install required packages -----------
-#sudo apt install fio docker-compose lsof python3-pip python3-venv -y
+sudo apt install fio docker-compose lsof python3-pip python3-venv -y
 # ----------- ----------- ----------- ----------- -
 
 src="/home/pietro/Pi"
