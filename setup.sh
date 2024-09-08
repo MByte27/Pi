@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ----------- Preliminary update of all installed packages -----------
-sudo apt update
-sudo apt full-upgrade -y
+#sudo apt update
+#sudo apt full-upgrade -y
 # ----------- ----------- ----------- ----------- ----------- --------
 
 # ----------- Install required packages -----------
-sudo apt install fio docker-compose lsof python3-pip python3-venv -y
+#sudo apt install fio docker-compose lsof python3-pip python3-venv -y
 # ----------- ----------- ----------- ----------- -
 
 src="/home/pietro/Pi"
@@ -53,13 +53,16 @@ move () {
   
               # If the destination folder is "etc", use sudo to copy the items
               if [ "$dest" = "etc" ]; then
-                  sudo cp -r "$item" "/$dest/$(basename "$item")"
-                  container_launch "/$dest/$(basename "$item")"
+#                  sudo cp -r "$item" "/$dest/$(basename "$item")"
+#                  container_launch "/$dest/$(basename "$item")"
 		  echo "Copy from: $item to /$dest/$(basename "$item")"
               else
-                  cp -r "$item" "/$dest/$(basename "$item")"
-		  container_launch "/$dest/$(basename "$item")"
-		  echo "Copy from $item to /$dest/$(basename "$item")"
+	      	if [ $dest = "pietro" ]; then
+                   dest="/home/$dest"
+		fi
+                cp -r "$item" "$dest/$(basename "$item")"
+	        container_launch "$dest/$(basename "$item")"
+ 	        echo "Copy from $item to $dest/$(basename "$item")"
               fi
           done
       fi
@@ -73,7 +76,7 @@ move () {
 	continue
       else
 	echo "Copying file $file.. "
-        cp "$file" ".."
+#        cp "$file" ".."
       fi
     fi
   done
