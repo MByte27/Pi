@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Control</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #6F7794;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            text-shadow: 0 0 5px #000000;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        #temperature-display {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #f0f0f0;
+            text-shadow: 0 0 5px #000000;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        #chart-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000000;
+        }
+
+        canvas {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Fan Control</h1>
+
+    <div id="temperature-display">Current CPU Temperature: --°C</div>
+
+    <div id="chart-container">
+        <canvas id="tempFanChart"></canvas>
+    </div>
+
+    <script>
+        const updateInterval = 5000; // Aggiorna ogni 5 secondi
+
+        function updateChartData(chart) {
+            fetch('/current_data')
+                .then(response => response.json())
+                .then(data => {
+                    const times = data.temperature_log.map(item => new Date(item[0] * 1000).toLocaleTimeString());
+                    const temps = data.temperature_log.map(item => item[1]);
+                    const fanSpeeds = data.fan_speed_log.map(item => item[1]);
+
+                    chart.data.labels = times;
+                    chart.data.datasets[0].data = temps;
+                    chart.data.datasets[1].data = fanSpeeds;
+                    chart.update();
+
+                    // Aggiorna la temperatura visualizzata
+                    const latestTemp = temps[temps.length - 1];
+                    document.getElementById('temperature-display').innerText = `Current CPU Temperature: ${latestTemp}°C`;
+                });
+        }
+
+        const ctx = document.getElementById('tempFanChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Etichette temporali
+                datasets: [
+                    {
+                        label: 'CPU Temperature (°C)',
+                        data: [],
+                        borderColor: '#ff4c4c',
+                        backgroundColor: 'rgba(255, 76, 76, 0.2)',
+                        yAxisID: 'y-temp',
+                    },
+                    {
+                        label: 'Fan Speed (%)',
+                        data: [],
+                        borderColor: '#1e90ff',
+                        backgroundColor: 'rgba(30, 144, 255, 0.2)',
+                        yAxisID: 'y-speed',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [
+                        {
+                            id: 'y-temp',
+                            type: 'linear',
+                            position: 'left',
+                            ticks: {
+                                min: 35,
+                                max: 80,
+                                stepSize: 5,
+                                color: '#ff4c4c',
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Temperature (°C)',
+                                color: '#ff4c4c'
+                            }
+                        },
+                        {
+                            id: 'y-speed',
+                            type: 'linear',
+                            position: 'right',
+                            ticks: {
+                                min: 0,
+                                max: 100,
+                                stepSize: 10,
+                                color: '#1e90ff',
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Fan Speed (%)',
+                                color: '#1e90ff'
+                            }
+                        }
+                    ],
+                    xAxes: [
+                        {
+                            ticks: {
+                                color: '#e0e0e0',
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+
+        // Aggiorna i dati iniziali
+        updateChartData(chart);
+
+        // Aggiorna i dati del grafico e la temperatura visualizzata ogni 5 secondi
+        setInterval(() => {
+            updateChartData(chart);
+        }, updateInterval);
+    </script>
+</body>
+</html>
+
