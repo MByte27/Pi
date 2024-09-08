@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ----------- Preliminary update of all installed packages -----------
-sudo apt update
-sudo apt full-upgrade -y
+#sudo apt update
+#sudo apt full-upgrade -y
 # ----------- ----------- ----------- ----------- ----------- --------
 
 # ----------- Install required packages -----------
-sudo apt install fio docker-compose lsof python3-pip python3-venv -y
+#sudo apt install fio docker-compose lsof python3-pip python3-venv -y
 # ----------- ----------- ----------- ----------- -
 
 src="/home/pietro/Pi"
@@ -21,40 +21,50 @@ fi
 
 # ----------- Launch container from docker-compose file, if present -----------
 container_launch() {
-  dir="$1"
 
-  for file in "$1/*"; do
-    if [ "$file" = "docker-compose.yml" ]; then
+  origin=$(pwd)
+
+  for file in "$1/"*; do
+    if [ "$(basename "$file")" = "docker-compose.yml" ]; then
+      echo "$file found! Launching container"
+      cd "$1"
       sudo docker-compose up -d
+      cd $origin
     fi
   done
-# ----------- ----------- ----------- ----------- ----------- ----------- ------
-    
-
 }
+# ----------- ----------- ----------- ----------- ----------- ----------- ------
 
 # ----------- Function to move folder in their respective place -----------
 move () {
   for folder in "$src"/*; do
-      if [ -d "$folder" ]; then
-          dest="$folder"
+      if [ -d $folder ]; then
+          dest="$(basename "$folder")"
+	  echo "Dest: $dest"
   
           # Loop over items inside each folder
           for item in "$folder"/*; do
-              # Check if the item is "uptime-kuma" and skip it if the device is Pi Zero
-              if [[ "$(basename "$item")" = "uptime-kuma" ]] && [ "$is_Zero" = true ]; then
+	      # Check if the item is "uptime-kuma" and skip it if the device is Pi Zero
+              if [ "$(basename "$item")" = "uptime-kuma" ] && [ "$is_Zero" = true ]; then
+		  echo "Skipping Uptime-Kuma.."
                   continue
               fi
   
               # If the destination folder is "etc", use sudo to copy the items
-              if [ "$(basename "$folder")" = "etc" ]; then
-                  sudo cp -r "$item" "$dest"
-                  container_launch "/etc/$dest/$item"
+              if [ "$dest" = "etc" ]; then
+                  sudo cp -r "$item" "/$dest/$(basename "$item")"
+                  container_launch "/$dest/$(basename "$item")"
+		  echo "Copy from: $item to /$dest/$(basename "$item")"
               else
-                  cp -r "$item" "$dest"
+                  cp -r "$item" "/$dest/$(basename "$item")"
+		  container_launch "/$dest/$(basename "$item")"
+		  echo "Copy from $item to /$dest/$(basename "$item")"
               fi
           done
       fi
   done
 }
 # ----------- ----------- ----------- ----------- ----------- -----
+
+
+move
