@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ----------- Preliminary update of all installed packages -----------
-#sudo apt update
-#sudo apt full-upgrade -y
+sudo apt update
+sudo apt full-upgrade -y
 # ----------- ----------- ----------- ----------- ----------- --------
 
 # ----------- Install required packages -----------
-#sudo apt install fio docker-compose lsof python3-pip python3-venv -y
+sudo apt install fio docker-compose lsof python3-pip python3-venv git -y
 # ----------- ----------- ----------- ----------- -
 
 src="/home/pietro/Pi"
@@ -53,8 +53,8 @@ move () {
   
               # If the destination folder is "etc", use sudo to copy the items
               if [ "$dest" = "etc" ]; then
-#                  sudo cp -r "$item" "/$dest/$(basename "$item")"
-#                  container_launch "/$dest/$(basename "$item")"
+                  sudo cp -r "$item" "/$dest/$(basename "$item")"
+                  container_launch "/$dest/$(basename "$item")"
 		  echo "Copy from: $item to /$dest/$(basename "$item")"
               else
 	      	if [ $dest = "pietro" ]; then
@@ -76,12 +76,22 @@ move () {
 	continue
       else
 	echo "Copying file $file.. "
-#        cp "$file" ".."
+        cp "$file" ".."
       fi
     fi
   done
 }
 # ----------- ----------- ----------- ----------- ----------- -----
 
+# ----------- ZSH terminal ----------- ----------- ----------- -----
+sudo apt install zsh -y
+chsh -s /bin/zsh #passwd required
+sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# modify /home/pietro/.zshrc using sudo to add "zsh-autosuggestions zsh-syntax-highlighting" in the brackets on the plugins = (git) line
+# also, change theme into "agnoster"
+sudo apt install fonts-powerline -y
+# ----------- ----------- ----------- ----------- ----------- -----
 
 move
